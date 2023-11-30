@@ -614,6 +614,9 @@ void ZygiskContext::run_modules_post() {
 void ZygiskContext::app_specialize_pre() {
     flags[APP_SPECIALIZE] = true;
     info_flags = zygiskd::GetProcessFlags(g_ctx->args.app->uid);
+    if ((info_flags & PROCESS_ON_DENYLIST) == PROCESS_ON_DENYLIST) {
+        flags[DO_REVERT_UNMOUNT] = true;
+    }
     run_modules_pre();
 }
 
