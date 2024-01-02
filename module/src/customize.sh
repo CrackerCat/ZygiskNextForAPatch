@@ -127,11 +127,6 @@ else
   mv "$MODPATH/machikado.arm" "$MODPATH/machikado"
 fi
 
-ui_print "- Generating magic"
-MAGIC=$(tr -dc 'a-f0-9' </dev/urandom | head -c 18)
-mkdir -p /data/adb/zygisksu || abort "failed to create zygisksu dir"
-echo -n "$MAGIC" > "/data/adb/zygisksu/magic"
-
 ui_print "- Setting permissions"
 set_perm_recursive "$MODPATH/lib" 0 0 0755 0644 u:object_r:system_lib_file:s0
 set_perm_recursive "$MODPATH/lib64" 0 0 0755 0644 u:object_r:system_lib_file:s0
