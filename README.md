@@ -11,12 +11,12 @@ Standalone implementation of Zygisk, providing Zygisk API support for KernelSU a
 ### KernelSU
 
 + Minimal KernelSU version: 10940
-+ Minimal ksud version: 11412
++ Minimal ksud version: 10942
 + Kernel has full SELinux patch support
 
 ### Magisk
 
-+ Minimal version: 26402
++ Minimal version: 26300
 + Built-in Zygisk turned off
 
 ## Compatibility
