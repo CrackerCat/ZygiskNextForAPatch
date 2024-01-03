@@ -17,17 +17,16 @@ pub const MAX_LOG_LEVEL: LevelFilter = LevelFilter::Trace;
 pub const MAX_LOG_LEVEL: LevelFilter = LevelFilter::Info;
 
 
-pub const PATH_CP_NAME: &str = lp_select!("/cp32.sock", "/cp64.sock");
 
 pub const PATH_MODULES_DIR: &str = "..";
 pub const PATH_MODULE_PROP: &str = "module.prop";
-pub const PATH_CP_BIN32: &str = "bin/zygisk-cp32";
-pub const PATH_CP_BIN64: &str = "bin/zygisk-cp64";
-pub const PATH_PT_BIN32: &str = "bin/zygisk-ptracer32";
-pub const PATH_PT_BIN64: &str = "bin/zygisk-ptracer64";
 pub const ZYGOTE_INJECTED: i32 = lp_select!(5, 4);
 pub const DAEMON_SET_INFO: i32 = lp_select!(7, 6);
 pub const DAEMON_SET_ERROR_INFO: i32 = lp_select!(9, 8);
+pub const SYSTEM_SERVER_STARTED: i32 = 10;
+pub const TMP_DIR: &str = "/debug_ramdisk/zygisksu";
+pub const CONTROLLER_SOCKET: &str = concatcp!(TMP_DIR, "/init_monitor");
+pub const PATH_CP_NAME: &str = concatcp!(TMP_DIR, lp_select!("/cp32.sock", "/cp64.sock"));
 
 pub const MAX_RESTART_COUNT: i32 = 5;
 
@@ -41,6 +40,7 @@ pub enum DaemonSocketAction {
     RequestCompanionSocket,
     GetModuleDir,
     ZygoteRestart,
+    SystemServerStarted,
 }
 
 // Zygisk process flags
@@ -49,6 +49,7 @@ bitflags! {
     pub struct ProcessFlags: u32 {
         const PROCESS_GRANTED_ROOT = 1 << 0;
         const PROCESS_ON_DENYLIST = 1 << 1;
+        const PROCESS_IS_MANAGER = 1 << 28;
         const PROCESS_ROOT_IS_KSU = 1 << 29;
         const PROCESS_ROOT_IS_KPATCH = 1 << 30;
         const PROCESS_IS_SYSUI = 1 << 31;

@@ -32,9 +32,6 @@ struct Context {
 
 pub fn main() -> Result<()> {
     log::info!("Welcome to Zygisk Next ({}) !", constants::ZKSU_VERSION);
-    let magic_path = std::env::var("MAGIC")?;
-    let controller_path = format!("init_monitor{}", magic_path);
-    log::info!("socket path {}", controller_path);
 
     let arch = get_arch()?;
     log::debug!("Daemon architecture: {arch}");
@@ -57,7 +54,7 @@ pub fn main() -> Result<()> {
         msg.extend_from_slice(&(info.len() as u32 + 1).to_le_bytes());
         msg.extend_from_slice(info.as_bytes());
         msg.extend_from_slice(&[0u8]);
-        utils::unix_datagram_sendto_abstract(controller_path.as_str(), msg.as_slice()).expect("failed to send info");
+        utils::unix_datagram_sendto(constants::CONTROLLER_SOCKET, msg.as_slice()).expect("failed to send info");
     }
 
     let context = Context {
@@ -74,7 +71,7 @@ pub fn main() -> Result<()> {
         match action {
             DaemonSocketAction::PingHeartbeat => {
                 let value = constants::ZYGOTE_INJECTED;
-                utils::unix_datagram_sendto_abstract(controller_path.as_str(), &value.to_le_bytes())?;
+                utils::unix_datagram_sendto(constants::CONTROLLER_SOCKET, &value.to_le_bytes())?;
             }
             DaemonSocketAction::ZygoteRestart => {
                 info!("Zygote restarted, clean up companions");
@@ -82,6 +79,10 @@ pub fn main() -> Result<()> {
                     let mut companion = module.companion.lock().unwrap();
                     companion.take();
                 }
+            }
+            DaemonSocketAction::SystemServerStarted => {
+                let value = constants::SYSTEM_SERVER_STARTED;
+                utils::unix_datagram_sendto(constants::CONTROLLER_SOCKET, &value.to_le_bytes())?;
             }
             _ => {
                 thread::spawn(move || {
@@ -140,12 +141,6 @@ fn load_modules(arch: &str) -> Result<Vec<Module>> {
     Ok(modules)
 }
 
-#[cfg(debug_assertions)]
-fn create_library_fd(so_path: &PathBuf) -> Result<OwnedFd> {
-    Ok(OwnedFd::from(fs::File::open(so_path)?))
-}
-
-#[cfg(not(debug_assertions))]
 fn create_library_fd(so_path: &PathBuf) -> Result<OwnedFd> {
     let opts = memfd::MemfdOptions::default().allow_sealing(true);
     let memfd = opts.create("jit-cache")?;
@@ -166,10 +161,7 @@ fn create_library_fd(so_path: &PathBuf) -> Result<OwnedFd> {
 
 fn create_daemon_socket() -> Result<UnixListener> {
     utils::set_socket_create_context("u:r:zygote:s0")?;
-    let magic_path = std::env::var("MAGIC_PATH")?;
-    let socket_path = magic_path + constants::PATH_CP_NAME;
-    log::debug!("Daemon socket: {}", socket_path);
-    let listener = utils::unix_listener_from_path(&socket_path)?;
+    let listener = utils::unix_listener_from_path(constants::PATH_CP_NAME)?;
     Ok(listener)
 }
 
@@ -229,11 +221,15 @@ fn handle_daemon_action(action: DaemonSocketAction, mut stream: UnixStream, cont
         DaemonSocketAction::GetProcessFlags => {
             let uid = stream.read_u32()? as i32;
             let mut flags = ProcessFlags::empty();
-            if root_impl::uid_granted_root(uid) {
-                flags |= ProcessFlags::PROCESS_GRANTED_ROOT;
-            }
-            if root_impl::uid_should_umount(uid) {
-                flags |= ProcessFlags::PROCESS_ON_DENYLIST;
+            if root_impl::uid_is_manager(uid) {
+                flags |= ProcessFlags::PROCESS_IS_MANAGER;
+            } else {
+                if root_impl::uid_granted_root(uid) {
+                    flags |= ProcessFlags::PROCESS_GRANTED_ROOT;
+                }
+                if root_impl::uid_should_umount(uid) {
+                    flags |= ProcessFlags::PROCESS_ON_DENYLIST;
+                }
             }
             match root_impl::get_impl() {
                 root_impl::RootImpl::KernelSU => flags |= ProcessFlags::PROCESS_ROOT_IS_KSU,
