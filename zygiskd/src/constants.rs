@@ -49,7 +49,6 @@ bitflags! {
     pub struct ProcessFlags: u32 {
         const PROCESS_GRANTED_ROOT = 1 << 0;
         const PROCESS_ON_DENYLIST = 1 << 1;
-        const PROCESS_IS_MANAGER = 1 << 28;
         const PROCESS_ROOT_IS_KSU = 1 << 29;
         const PROCESS_ROOT_IS_KPATCH = 1 << 30;
         const PROCESS_IS_SYSUI = 1 << 31;
