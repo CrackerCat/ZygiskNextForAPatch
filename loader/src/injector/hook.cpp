@@ -21,6 +21,7 @@
 #include "module.hpp"
 #include "files.hpp"
 #include "misc.hpp"
+#include "solist.hpp"
 
 #include "art_method.hpp"
 
@@ -553,6 +554,37 @@ void ZygiskContext::run_modules_pre() {
         if (void* handle = DlopenMem(m.memfd, RTLD_NOW);
             void* entry = handle ? dlsym(handle, "zygisk_module_entry") : nullptr) {
             modules.emplace_back(i, handle, entry);
+        }
+    }
+
+    // Remove from SoList to avoid detection
+    bool solist_res = SoList::Initialize();
+    if (!solist_res) {
+        LOGE("Failed to initialize SoList\n");
+    } else {
+        SoList::NullifySoName("jit-cache");
+    }
+
+    // Remap as well to avoid checking of /memfd:jit-cache
+    for (auto &info : lsplt::MapInfo::Scan()) {
+        if (strstr(info.path.c_str(), "jit-cache-zygisk"))
+        {
+            LOGI("Remap jit-cache-zygisk at address %p", info.start);
+
+            void *addr = (void *)info.start;
+            size_t size = info.end - info.start;
+            void *copy = mmap(nullptr, size, PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+            if (copy == MAP_FAILED) {
+                LOGE("Failed to mmap jit-cache-zygisk\n");
+                continue;
+            }
+
+            if ((info.perms & PROT_READ) == 0) {
+                mprotect(addr, size, PROT_READ);
+            }
+            memcpy(copy, addr, size);
+            mremap(copy, size, size, MREMAP_MAYMOVE | MREMAP_FIXED, addr);
+            mprotect(addr, size, info.perms);
         }
     }
 
