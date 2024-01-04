@@ -60,7 +60,6 @@ namespace zygiskd {
         RequestCompanionSocket,
         GetModuleDir,
         ZygoteRestart,
-        SystemServerStarted,
     };
 
     void Init(const char *path = TMP_PATH);
@@ -78,6 +77,4 @@ namespace zygiskd {
     int GetModuleDir(size_t index);
 
     void ZygoteRestart();
-
-    void SystemServerStarted();
 }
