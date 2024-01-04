@@ -15,6 +15,7 @@
 #include <sys/mount.h>
 #include <time.h>
 #include <fcntl.h>
+#include <string>
 
 #include "main.hpp"
 #include "utils.hpp"
@@ -544,7 +545,8 @@ static void updateStatus() {
 }
 
 static bool prepare_environment() {
-    prop_path = TMP_PATH + "/module.prop";
+    std::string TMP2_PATH = std::string(TMP_PATH);
+    std::string prop_path = TMP2_PATH + "/module.prop";
     close(open(prop_path.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644));
     auto orig_prop = xopen_file("./module.prop", "r");
     if (orig_prop == nullptr) {
