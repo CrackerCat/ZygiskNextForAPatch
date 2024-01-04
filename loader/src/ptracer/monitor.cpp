@@ -535,8 +535,7 @@ static void updateStatus() {
 }
 
 static bool prepare_environment() {
-    std::string tmp2_path = std::string(TMP_PATH);
-    std::string prop_path = tmp2_path + "/module.prop";
+    prop_path = TMP_PATH "/module.prop";
     close(open(prop_path.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644));
     auto orig_prop = xopen_file("./module.prop", "r");
     if (orig_prop == nullptr) {
