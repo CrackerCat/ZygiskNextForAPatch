@@ -100,7 +100,7 @@ public:
         return true;
     }
 
-    bool UnregisterHandler(EventHandler &handler) {
+    [[maybe_unused]] bool UnregisterHandler(EventHandler &handler) {
         if (epoll_ctl(epoll_fd_, EPOLL_CTL_DEL, handler.GetFd(), nullptr) == -1) {
             PLOGE("failed to del event handler");
             return false;
@@ -155,7 +155,7 @@ struct SocketHandler : public EventHandler {
         return sock_fd_;
     }
 
-    void HandleEvent(EventLoop &loop, uint32_t event) override {
+    void HandleEvent(EventLoop &loop, uint32_t) override {
         struct [[gnu::packed]] MsgHead {
             Command cmd;
             int length;
@@ -343,7 +343,7 @@ public:
         return signal_fd_;
     }
 
-    void HandleEvent(EventLoop &loop, uint32_t event) override {
+    void HandleEvent(EventLoop &, uint32_t) override {
         for (;;) {
             ssize_t s = read(signal_fd_, &fdsi, sizeof(fdsi));
             if (s == -1) {
@@ -625,7 +625,7 @@ void send_control_command(Command cmd) {
     if (nsend == -1) {
         err(EXIT_FAILURE, "send");
     } else if (nsend != sizeof(cmd)) {
-        printf("send %ld != %ld\n", nsend, sizeof(cmd));
+        printf("send %zu != %zu\n", nsend, sizeof(cmd));
         exit(1);
     }
     printf("command sent\n");
