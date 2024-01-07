@@ -30,14 +30,14 @@ fn read_package_config() -> Result<Vec<Vec<String>>, std::io::Error> {
     let file = File::open("/data/adb/ap/package_config")?;
     let reader = BufReader::new(file);
     let lines = reader.lines().collect::<Result<Vec<_>, _>>()?;
-    Ok(lines.iter().map(|line| line.split(",").collect()).collect())
+    Ok(lines.iter().map(|line| line.split(",").map(String::from).collect()).collect())
 }
 
 pub fn uid_granted_root(uid: i32) -> bool {
     let package_config = read_package_config().unwrap_or_default();
 
     package_config.iter().any(|parts| {
-        parts[3] == &uid.to_string() && parts[2] == "1"
+        parts[3] == uid.to_string() && parts[2] == "1"
     })
 }
 
@@ -45,7 +45,7 @@ pub fn uid_should_umount(uid: i32) -> bool {
     let package_config = read_package_config().unwrap_or_default();
 
     let result = package_config.iter().any(|parts| {
-        if parts[3] == &uid.to_string() && parts[1] == "0" {
+        if parts[3] == uid.to_string() && parts[1] == "0" {
             false
         } else {
             true
