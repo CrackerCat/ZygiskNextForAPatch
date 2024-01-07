@@ -26,41 +26,27 @@ pub fn get_kpatch() -> Option<crate::root_impl::kpatch::Version> {
     })
 }
 
-pub fn uid_granted_root(uid: i32) -> bool {
-    let file = File::open("/data/adb/ap/package_config").unwrap();
+fn read_package_config() -> Result<Vec<Vec<&str>>, std::io::Error> {
+    let file = File::open("/data/adb/ap/package_config")?;
     let reader = BufReader::new(file);
-
-    let lines = reader.lines().collect::<Vec<String>>();
-
-    let result = lines.iter().any(|line| {
-        let parts = line.split(",").collect::<Vec<&str>>();
-
-        if parts[3] == &uid.to_string() {
-            return parts[2] == "1";
-        } else {
-            return false;
-        }
-    });
-
-    result
+    let lines = reader.lines().collect::<Result<Vec<_>, _>>()?;
+    Ok(lines.iter().map(|line| line.split(",").collect()).collect())
 }
 
+pub fn uid_granted_root(uid: i32) -> bool {
+    let package_config = read_package_config().unwrap_or_default();
 
+    package_config.iter().any(|parts| {
+        parts[3] == &uid.to_string() && parts[2] == "1"
+    })
+}
 
 pub fn uid_should_umount(uid: i32) -> bool {
-    let file = File::open("/data/adb/ap/package_config").unwrap();
-    let reader = BufReader::new(file);
+    let package_config = read_package_config().unwrap_or_default();
 
-    let lines = reader.lines().collect::<Vec<String>>();
-
-    let result = lines.iter().any(|line| {
-        let parts = line.split(",").collect::<Vec<&str>>();
-
-        if parts[3] == &uid.to_string() {
-            return parts[1] == "1";
-        } else {
-            return true;
-        }
+    let result = package_config.iter().any(|parts| {
+        parts[3] == &uid.to_string() && parts[1] == "0" => false,
+        _ => true,
     });
 
     result
