@@ -9,8 +9,7 @@ pub enum Version {
 }
 
 pub fn get_kpatch() -> Option<crate::root_impl::kpatch::Version> {
-    let version: Option<i32> = Command::new("exec")
-        .arg("/data/adb/kpatch")
+    let version: Option<i32> = Command::new("/data/adb/kpatch")
         .arg("-v")
         .stdout(Stdio::piped())
         .spawn().ok()
