@@ -40,7 +40,7 @@ struct PackageConfig {
 
 fn read_package_config() -> Result<Vec<PackageConfig>, std::io::Error> {
     let file = File::open("/data/adb/ap/package_config")?;
-    let reader = csv::Reader::from_reader(file);
+    let mut reader = csv::Reader::from_reader(file);
 
     let mut package_configs = Vec::new();
     for record in reader.deserialize() {
