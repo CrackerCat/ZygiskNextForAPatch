@@ -56,21 +56,33 @@ fn read_package_config() -> Result<Vec<PackageConfig>, std::io::Error> {
 }
 
 pub fn uid_granted_root(uid: i32) -> bool {
-    let package_configs = read_package_config()?;
-
-    package_configs
-        .iter()
-        .find(|config| config.uid == uid)
-        .map(|config| config.allow == 1)
-        .unwrap_or(false)
+    match read_package_config() {
+        Ok(package_configs) => {
+            package_configs
+                .iter()
+                .find(|config| config.uid == uid)
+                .map(|config| config.allow == 1)
+                .unwrap_or(false)
+        }
+        Err(err) => {
+            println!("Error reading package config: {}", err);
+            return false;
+        }
+    }
 }
 
 pub fn uid_should_umount(uid: i32) -> bool {
-    let package_configs = read_package_config()?;
-
-    package_configs
-        .iter()
-        .find(|config| config.uid == uid)
-        .map(|config| config.exclude == 1)
-        .unwrap_or(false)
+    match read_package_config() {
+        Ok(package_configs) => {
+            package_configs
+                .iter()
+                .find(|config| config.uid == uid)
+                .map(|config| config.exclude == 1)
+                .unwrap_or(false)
+        }
+        Err(err) => {
+            println!("Error reading package config: {}", err);
+            return false;
+        }
+    }
 }
