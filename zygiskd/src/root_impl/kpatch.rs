@@ -26,7 +26,7 @@ pub fn get_kpatch() -> Option<crate::root_impl::kpatch::Version> {
     })
 }
 
-fn read_package_config() -> Result<Vec<Vec<&str>>, std::io::Error> {
+fn read_package_config() -> Result<Vec<Vec<String>>, std::io::Error> {
     let file = File::open("/data/adb/ap/package_config")?;
     let reader = BufReader::new(file);
     let lines = reader.lines().collect::<Result<Vec<_>, _>>()?;
@@ -45,8 +45,11 @@ pub fn uid_should_umount(uid: i32) -> bool {
     let package_config = read_package_config().unwrap_or_default();
 
     let result = package_config.iter().any(|parts| {
-        parts[3] == &uid.to_string() && parts[1] == "0" => false,
-        _ => true,
+        if parts[3] == &uid.to_string() && parts[1] == "0" {
+            false
+        } else {
+            true
+        }        
     });
 
     result
