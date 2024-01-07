@@ -2,6 +2,7 @@ use std::process::{Command, Stdio};
 use crate::constants::KPATCH_VER_CODE;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
+use csv::Reader;
 
 pub enum Version {
     Supported,
@@ -25,31 +26,40 @@ pub fn get_kpatch() -> Option<crate::root_impl::kpatch::Version> {
     })
 }
 
-fn read_package_config() -> Result<Vec<Vec<String>>, std::io::Error> {
+struct PackageConfig {
+    pkg: i32,
+    exclude: String,
+    allow: i32,
+    uid: i32,
+    to_uid: i32,
+    sctx: String,
+}
+
+
+fn read_package_config() -> Result<Vec<PackageConfig>, std::io::Error> {
     let file = File::open("/data/adb/ap/package_config")?;
-    let reader = BufReader::new(file);
-    let lines = reader.lines().collect::<Result<Vec<_>, _>>()?;
-    Ok(lines.iter().map(|line| line.split(",").map(String::from).collect()).collect())
+    let reader = csv::Reader::from_reader(file);
+
+    let mut package_configs = Vec::new();
+    for record in reader.deserialize::<PackageConfig>()? {
+        package_configs.push(record);
+    }
+
+    Ok(package_configs)
 }
 
 pub fn uid_granted_root(uid: i32) -> bool {
     let package_config = read_package_config().unwrap_or_default();
 
-    package_config.iter().any(|parts| {
-        parts[3] == uid.to_string() && parts[2] == "1"
-    })
+    package_config.iter().find(|config| config.uid == uid)
+        .map(|config| config.allow == "1")
+        .unwrap_or(false)
 }
 
 pub fn uid_should_umount(uid: i32) -> bool {
     let package_config = read_package_config().unwrap_or_default();
 
-    let result = package_config.iter().any(|parts| {
-        if parts[3] == uid.to_string() && parts[1] == "0" {
-            false
-        } else {
-            true
-        }        
-    });
-
-    result
+    package_config.iter().find(|config| config.uid == uid)
+        .map(|config| config.exclude == "1")
+        .unwrap_or(false)
 }
