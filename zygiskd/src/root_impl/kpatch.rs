@@ -84,7 +84,7 @@ pub fn uid_should_umount(uid: i32) -> bool {
                         _ => true,
                     }
                 })
-                .unwrap()
+                .unwrap_or(true)
         }
         Err(err) => {
             log::warn!("Error reading package configs");
