@@ -81,7 +81,7 @@ pub fn uid_should_umount(uid: i32) -> bool {
                 .unwrap_or(false)
         }
         Err(err) => {
-            println!("uid not found umount by default...")
+            println!("uid not found umount by default...");
             return true;
         }
     }
