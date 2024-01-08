@@ -81,8 +81,8 @@ pub fn uid_should_umount(uid: i32) -> bool {
                 .unwrap_or(false)
         }
         Err(err) => {
-            println!("Error reading package config: {}", err);
-            return false;
+            println!("uid not found umount by default...")
+            return true;
         }
     }
 }
