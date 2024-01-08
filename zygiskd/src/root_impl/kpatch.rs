@@ -78,15 +78,8 @@ pub fn uid_should_umount(uid: i32) -> bool {
                 .iter()
                 .find(|config| config.uid == uid)
                 .map(|config| {
-                    if let Some(exclude) = config.exclude {
-                        if exclude == 1 {
-                            true
-                        } else {
-                            false
-                        }
-                    } else {
-                        true
-                    }
+                    config.exclude.map(|exclude| exclude == 1 || exclude.is_none())
+                        .unwrap_or(config.exclude == 0)
                 })
                 .unwrap_or(false)
         }
