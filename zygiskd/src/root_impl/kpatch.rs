@@ -77,12 +77,18 @@ pub fn uid_should_umount(uid: i32) -> bool {
             package_configs
                 .iter()
                 .find(|config| config.uid == uid)
-                .map(|config| config.exclude == 1)
+                .map(|config| {
+                    if let Some(exclude) = config.exclude {
+                        exclude == 1
+                    } else {
+                        true
+                    }
+                })
                 .unwrap_or(false)
         }
         Err(err) => {
-            println!("uid not found umount by default...");
-            return true;
+            println!("Error reading package configs");
+            false
         }
     }
 }
