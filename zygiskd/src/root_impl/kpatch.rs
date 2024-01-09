@@ -72,6 +72,10 @@ pub fn uid_granted_root(uid: i32) -> bool {
 }
 
 pub fn uid_should_umount(uid: i32) -> bool {
+    if is_system_uid(uid) {
+        return false;
+    }
+
     match read_package_config() {
         Ok(package_configs) => {
             package_configs
@@ -91,4 +95,8 @@ pub fn uid_should_umount(uid: i32) -> bool {
             false
         }
     }
+}
+
+fn is_system_uid(uid: i32) -> bool {
+    uid < 1000
 }
