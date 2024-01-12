@@ -644,6 +644,19 @@ void ZygiskContext::run_modules_post() {
             // https://lore.kernel.org/lkml/1383170047-21074-2-git-send-email-ccross@android.com/
             prctl(PR_SET_VMA, PR_SET_VMA_ANON_NAME, info.start, info.end - info.start, strAddr);
         }
+
+        // Remap as MAP_SHARED
+        if (info.perms & PROT_EXEC && info.dev == 0 && info.path.find("anon") != std::string::npos) {
+            void *addr = reinterpret_cast<void *>(info.start);
+            size_t size = info.end - info.start;
+            void *copy = mmap(nullptr, size, PROT_WRITE, MAP_ANONYMOUS | MAP_SHARED, -1, 0);
+            if ((info.perms & PROT_READ) == 0) {
+                mprotect(addr, size, PROT_READ);
+            }
+            memcpy(copy, addr, size);
+            mremap(copy, size, size, MREMAP_MAYMOVE | MREMAP_FIXED, addr);
+            mprotect(addr, size, info.perms);
+        }
     }
 }
 
