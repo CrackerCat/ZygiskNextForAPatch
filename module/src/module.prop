@@ -4,4 +4,4 @@ version=${versionName}
 versionCode=${versionCode}
 author=Nullptr, 5ec1cff
 description=Standalone implementation of Zygisk.
-updateJson=https://api.nullptr.icu/android/zygisk-next/static/update.json
+updateJson=https://github.com/Yervant7/ZygiskNext/blob/master/update.json
