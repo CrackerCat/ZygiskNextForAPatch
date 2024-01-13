@@ -40,7 +40,7 @@ androidComponents.onVariants { variant ->
     val buildTypeLowered = variant.buildType?.toLowerCase()
 
     val moduleDir = layout.buildDirectory.dir("outputs/module/$variantLowered")
-    val zipFileName = "$moduleName-$verName-$verCode-$commitHash-$buildTypeLowered.zip".replace(' ', '-')
+    val zipFileName = "$moduleName-$verName-$verCode-$buildTypeLowered.zip".replace(' ', '-')
 
     val prepareModuleFilesTask = task<Sync>("prepareModuleFiles$variantCapped") {
         group = "module"
