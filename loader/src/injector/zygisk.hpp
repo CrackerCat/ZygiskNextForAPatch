@@ -10,5 +10,5 @@ void hook_functions();
 
 void revert_unmount_ksu();
 
-void revert_unmount_kpatch();
+void revert_unmount_apatch();
 

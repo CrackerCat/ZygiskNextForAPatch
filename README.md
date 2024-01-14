@@ -1,6 +1,6 @@
 # Zygisk Next
 
-Standalone implementation of Zygisk, providing Zygisk API support for KernelSU and a replacement of Magisk's built-in Zygisk.
+Standalone implementation of Zygisk, providing Zygisk API support for KernelSU and APatch a replacement of Magisk's built-in Zygisk.
 
 ## Requirements
 
@@ -14,13 +14,10 @@ Standalone implementation of Zygisk, providing Zygisk API support for KernelSU a
 + Minimal ksud version: 10942
 + Kernel has full SELinux patch support
 
-### Magisk
+### APatch
 
-+ Minimal version: 26300
-+ Built-in Zygisk turned off
++ Minimal version: 10420
 
 ## Compatibility
-
-`PROCESS_ON_DENYLIST` cannot be flagged correctly for isolated processes on Magisk DenyList currently.
 
 Zygisk Next only guarantees the same behavior of Zygisk API, but will NOT ensure Magisk's internal features.

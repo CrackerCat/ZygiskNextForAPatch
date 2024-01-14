@@ -1,6 +1,7 @@
 use std::process::{Command, Stdio};
-use crate::constants::KPATCH_VER_CODE;
+use crate::constants::MIN_APATCH_VER;
 use std::fs::File;
+use std::fs;
 use std::io::{BufRead, BufReader};
 use csv::Reader;
 use serde::Deserialize;
@@ -10,16 +11,12 @@ pub enum Version {
     TooOld,
 }
 
-pub fn get_kpatch() -> Option<crate::root_impl::kpatch::Version> {
-    let version: Option<i32> = Command::new("/data/adb/kpatch")
-        .arg("-v")
-        .stdout(Stdio::piped())
-        .spawn().ok()
-        .and_then(|child| child.wait_with_output().ok())
-        .and_then(|output| String::from_utf8(output.stdout).ok())
-        .and_then(|output| output.trim().parse().ok());
+pub fn get_apatch() -> Option<crate::root_impl::apatch::Version> {
+    let file_path = "/data/adb/ap/version";
+    let contents = fs::read_to_string(file_path).ok()?;
+    let version: Option<i32> = contents.trim().parse().ok();
     version.map(|version| {
-        if version >= KPATCH_VER_CODE {
+        if version >= MIN_APATCH_VER {
             Version::Supported
         } else {
             Version::TooOld
@@ -72,10 +69,6 @@ pub fn uid_granted_root(uid: i32) -> bool {
 }
 
 pub fn uid_should_umount(uid: i32) -> bool {
-    if is_system_uid(uid) {
-        return false;
-    }
-
     match read_package_config() {
         Ok(package_configs) => {
             package_configs
@@ -95,8 +88,4 @@ pub fn uid_should_umount(uid: i32) -> bool {
             false
         }
     }
-}
-
-fn is_system_uid(uid: i32) -> bool {
-    uid < 1000
 }

@@ -3,5 +3,5 @@ name=${moduleName}
 version=${versionName}
 versionCode=${versionCode}
 author=Nullptr, 5ec1cff
-description=Standalone implementation of Zygisk.
+description=APatch Standalone implementation of Zygisk.
 updateJson=https://raw.githubusercontent.com/Yervant7/ZygiskNext/master/update.json

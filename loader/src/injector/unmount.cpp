@@ -67,7 +67,7 @@ void revert_unmount_ksu() {
 }
 
 
-void revert_unmount_kpatch() {
+void revert_unmount_apatch() {
     std::string apatch_loop;
     std::vector<std::string> targets;
 

@@ -26,7 +26,7 @@ val verName: String by rootProject.extra
 val minKsuVersion: Int by rootProject.extra
 val minKsudVersion: Int by rootProject.extra
 val maxKsuVersion: Int by rootProject.extra
-val kpatchVerCode: Int by rootProject.extra
+val minAPatchVerCode: Int by rootProject.extra
 val commitHash: String by rootProject.extra
 
 android.buildFeatures {
@@ -71,7 +71,7 @@ androidComponents.onVariants { variant ->
                 "MIN_KSU_VERSION" to "$minKsuVersion",
                 "MIN_KSUD_VERSION" to "$minKsudVersion",
                 "MAX_KSU_VERSION" to "$maxKsuVersion",
-                "KPTACH_VER_CODE" to "$kpatchVerCode",
+                "MIN_APATCH_VER" to "$minAPatchVerCode",
             )
             filter<ReplaceTokens>("tokens" to tokens)
             filter<FixCrLfFilter>("eol" to FixCrLfFilter.CrLf.newInstance("lf"))
@@ -218,7 +218,7 @@ androidComponents.onVariants { variant ->
         }
     }
 
-    val installKpatchTask = task<Exec>("installKpatch$variantCapped") {
+    val installapatchTask = task<Exec>("installapatch$variantCapped") {
         group = "module"
         dependsOn(pushTask)
         commandLine("adb", "shell", "su", "-c", "/data/adb/apd module install /data/local/tmp/$zipFileName")
@@ -230,9 +230,9 @@ androidComponents.onVariants { variant ->
         commandLine("adb", "reboot")
     }
 
-    task<Exec>("installKpatchAndReboot$variantCapped") {
+    task<Exec>("installapatchAndReboot$variantCapped") {
         group = "module"
-        dependsOn(installKpatchTask)
+        dependsOn(installapatchTask)
         commandLine("adb", "reboot")
     }
 }

@@ -1,4 +1,3 @@
-##v4-0.9.1-269
-1 replace magisk to support APatch
-2 umount by default
-3 some commits for hiding zygisk..
+##v4-0.9.2-270
+1- rename kpatch codes for apatch
+2- umount system apps by default again

@@ -1,5 +1,5 @@
 mod kernelsu;
-mod kpatch;
+mod apatch;
 
 #[derive(Debug)]
 pub enum RootImpl {
@@ -8,16 +8,16 @@ pub enum RootImpl {
     Abnormal,
     Multiple,
     KernelSU,
-    Kpatch,
+    APatch,
 }
 
 static mut ROOT_IMPL: RootImpl = RootImpl::None;
 
 pub fn setup() {
     let ksu_version = kernelsu::get_kernel_su();
-    let kpatch_version = kpatch::get_kpatch();
+    let apatch_version = apatch::get_apatch();
 
-    let impl_ = match (ksu_version, kpatch_version) {
+    let impl_ = match (ksu_version, apatch_version) {
         (None, None ) => RootImpl::None,
         (Some(_), Some(_)) => RootImpl::Multiple,
         (Some(ksu_version), None) => {
@@ -27,10 +27,10 @@ pub fn setup() {
                 kernelsu::Version::Abnormal => RootImpl::Abnormal,
             }
         }
-        (None, Some(kpatch_version)) => {
-            match kpatch_version {
-                kpatch::Version::Supported => RootImpl::Kpatch,
-                kpatch::Version::TooOld => RootImpl::TooOld,
+        (None, Some(apatch_version)) => {
+            match apatch_version {
+                apatch::Version::Supported => RootImpl::APatch,
+                apatch::Version::TooOld => RootImpl::TooOld,
             }
         }
     };
@@ -44,7 +44,7 @@ pub fn get_impl() -> &'static RootImpl {
 pub fn uid_granted_root(uid: i32) -> bool {
     match get_impl() {
         RootImpl::KernelSU => kernelsu::uid_granted_root(uid),
-        RootImpl::Kpatch => kpatch::uid_granted_root(uid),
+        RootImpl::APatch => apatch::uid_granted_root(uid),
         _ => panic!("uid_granted_root: unknown root impl {:?}", get_impl()),
     }
 }
@@ -52,7 +52,7 @@ pub fn uid_granted_root(uid: i32) -> bool {
 pub fn uid_should_umount(uid: i32) -> bool {
     match get_impl() {
         RootImpl::KernelSU => kernelsu::uid_should_umount(uid),
-        RootImpl::Kpatch => kpatch::uid_should_umount(uid),
+        RootImpl::APatch => apatch::uid_should_umount(uid),
         _ => panic!("uid_should_umount: unknown root impl {:?}", get_impl()),
     }
 }

@@ -5,7 +5,7 @@ DEBUG=@DEBUG@
 MIN_KSU_VERSION=@MIN_KSU_VERSION@
 MIN_KSUD_VERSION=@MIN_KSUD_VERSION@
 MAX_KSU_VERSION=@MAX_KSU_VERSION@
-KPATCH_VER_CODE=@KPATCH_VER_CODE@
+MIN_APATCH_VER=@MIN_APATCH_VER@
 
 if [ "$BOOTMODE" ] && [ "$KSU" ]; then
   ui_print "- Installing from KernelSU app"
@@ -30,10 +30,16 @@ if [ "$BOOTMODE" ] && [ "$KSU" ]; then
   fi
 elif [ "$BOOTMODE" ] && [ "$APATCH" ]; then
   ui_print "- Installing from Apatch app"
+  if [ "$APATCH_VER" -lt "$MIN_APATCH_VER" ]; then
+    ui_print "*********************************************************"
+    ui_print "! APatch version is too old!"
+    ui_print "! Please update APatch to latest version"
+    abort    "*********************************************************"
+  fi
 else
   ui_print "*********************************************************"
   ui_print "! Install from recovery is not supported"
-  ui_print "! Please install from KernelSU or Magisk app"
+  ui_print "! Please install from KernelSU or APatch app"
   abort    "*********************************************************"
 fi
 
