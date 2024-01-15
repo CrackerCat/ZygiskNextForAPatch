@@ -677,13 +677,6 @@ void ZygiskContext::app_specialize_pre() {
     }
 }
 
-/* Zygisksu changed: Load module fds */
-void ZygiskContext::app_specialize_pre() {
-    flags[APP_SPECIALIZE] = true;
-    info_flags = zygiskd::GetProcessFlags(g_ctx->args.app->uid);
-
-}
-
 void ZygiskContext::app_specialize_post() {
     run_modules_post();
 
