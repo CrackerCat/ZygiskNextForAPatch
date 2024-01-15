@@ -43,7 +43,7 @@ pub fn main() -> Result<()> {
     {
         let mut msg = Vec::<u8>::new();
         let info = match root_impl::get_impl() {
-            root_impl::RootImpl::KernelSU | root_impl::RootImpl::APatch => {
+            root_impl::RootImpl::KernelSU | root_impl::RootImpl::APatch | root_impl::RootImpl::Magisk => {
                 msg.extend_from_slice(&constants::DAEMON_SET_INFO.to_le_bytes());
                 let module_names: Vec<_> = modules.iter()
                     .map(|m| m.name.as_str()).collect();
