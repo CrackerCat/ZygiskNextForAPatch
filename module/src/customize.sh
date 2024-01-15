@@ -6,6 +6,7 @@ MIN_KSU_VERSION=@MIN_KSU_VERSION@
 MIN_KSUD_VERSION=@MIN_KSUD_VERSION@
 MAX_KSU_VERSION=@MAX_KSU_VERSION@
 MIN_APATCH_VER=@MIN_APATCH_VER@
+MIN_MAGISK_VERSION=@MIN_MAGISK_VERSION@
 
 if [ "$BOOTMODE" ] && [ "$KSU" ]; then
   ui_print "- Installing from KernelSU app"
@@ -34,6 +35,14 @@ elif [ "$BOOTMODE" ] && [ "$APATCH" ]; then
     ui_print "*********************************************************"
     ui_print "! APatch version is too old!"
     ui_print "! Please update APatch to latest version"
+    abort    "*********************************************************"
+  fi
+elif [ "$BOOTMODE" ] && [ "$MAGISK_VER_CODE" ]; then
+  ui_print "- Installing from Magisk app"
+  if [ "$MAGISK_VER_CODE" -lt "$MIN_MAGISK_VERSION" ]; then
+    ui_print "*********************************************************"
+    ui_print "! Magisk version is too old!"
+    ui_print "! Please update Magisk to latest version"
     abort    "*********************************************************"
   fi
 else

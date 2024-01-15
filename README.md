@@ -18,6 +18,11 @@ Standalone implementation of Zygisk, providing Zygisk API support for KernelSU a
 
 + Minimal version: 10420
 
+### Magisk
+
++ Minimal version: 26402
++ Built-in Zygisk turned off
+
 ## Compatibility
 
 Zygisk Next only guarantees the same behavior of Zygisk API, but will NOT ensure Magisk's internal features.

@@ -12,3 +12,4 @@ void revert_unmount_ksu();
 
 void revert_unmount_apatch();
 
+void revert_unmount_magisk();
