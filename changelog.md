@@ -1,3 +1,4 @@
-##v4-0.9.3-283
+##v4-0.9.4-285
 
-1- added support for magisk again, kitsune and alpha too
+1- remove automatically umount 
+2- soon new module for use umount
