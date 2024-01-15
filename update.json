@@ -1,6 +1,6 @@
 {
-  "versionCode": 273,
-  "version": "v4-0.9.2",
-  "zipUrl": "https://github.com/Yervant7/ZygiskNext/releases/download/v4-0.9.2-273/Zygisk-Next-v4-0.9.2-273-release.zip",
+  "versionCode": 283,
+  "version": "v4-0.9.3",
+  "zipUrl": "https://github.com/Yervant7/ZygiskNext/releases/download/v4-0.9.3-283/Zygisk-Next-v4-0.9.3-283-release.zip",
   "changelog": "https://raw.githubusercontent.com/Yervant7/ZygiskNext/master/changelog.md"
 }
